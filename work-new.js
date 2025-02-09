@@ -107,20 +107,65 @@ document.getElementById('studentForm').addEventListener('submit', async function
 
     try {
         await saveStudent(student);
-        resetForm();
+        document.getElementById('studentForm').reset();
         showNotification('Student added successfully!');
     } catch (error) {
+        console.error('Error adding student:', error);
         showNotification('Error adding student. Please try again.', '#ff0000');
     }
 });
+
+// Make these functions available globally for button clicks
+window.editStudent = async function(studentNumber) {
+    const student = students.find(s => s.studentNumber === studentNumber);
+    if (student) {
+        document.getElementById('studentNumber').value = student.studentNumber;
+        document.getElementById('studentName').value = student.name;
+        document.getElementById('grade').value = student.grade;
+    }
+};
+
+window.deleteStudent = async function(studentNumber) {
+    if (confirm('Are you sure you want to delete this student?')) {
+        try {
+            await deleteStudentFromSupabase(studentNumber);
+            showNotification('Student deleted successfully!');
+        } catch (error) {
+            console.error('Error deleting student:', error);
+            showNotification('Error deleting student. Please try again.', '#ff0000');
+        }
+    }
+};
 
 // Initialize the application when the page loads
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, initializing app...');
     initializeApp();
     
-    // Add other event listeners
-    document.getElementById('searchInput').addEventListener('input', searchStudents);
+    // Add search functionality
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const filteredStudents = students.filter(student => 
+            student.name.toLowerCase().includes(searchTerm) ||
+            student.studentNumber.toLowerCase().includes(searchTerm)
+        );
+        
+        const tableBody = document.querySelector('#studentTable tbody');
+        tableBody.innerHTML = '';
+        filteredStudents.forEach(student => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${student.studentNumber}</td>
+                <td>${student.name}</td>
+                <td>${student.grade}</td>
+                <td>
+                    <button onclick="editStudent('${student.studentNumber}')" class="edit-btn">Edit</button>
+                    <button onclick="deleteStudent('${student.studentNumber}')" class="delete-btn">Delete</button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    });
     
     // Set current term and year
     const currentDate = new Date();
