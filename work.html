@@ -4,12 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RIVERDALE ACADEMY</title>
-    <link rel = "stylesheet" href = "work.css">
+    <link rel="stylesheet" href="work.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  
- 
+    
+    <!-- Add Supabase Client Library -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
+    <!-- Add QR code and Chart.js libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Service Worker Registration -->
     <script>
-        // Register the service worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('service-worker.js').then(function(registration) {
@@ -21,16 +27,7 @@
         }
     </script>
 
-    <!-- Add QR code library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-    <!-- Add Chart.js library -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <!-- Add this in the head section if not already present -->
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-
-    <!-- Add this in the head section of your HTML -->
     <style>
         /* Modern color palette */
         :root {
@@ -1102,184 +1099,50 @@
             </div>
         </div>
 
-        <script>
-        // Single script to handle all payroll functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const showPayrollBtn = document.getElementById('showPayrollBtn');
-            const payrollModal = document.getElementById('payrollModal');
-            const payrollForm = document.getElementById('payrollForm');
-
-            // Show modal
-            showPayrollBtn.addEventListener('click', function() {
-                console.log('Show button clicked');
-                payrollModal.style.display = 'block';
-            });
-
-            // Close modal when clicking (x) or outside
-            window.onclick = function(event) {
-                if (event.target === payrollModal) {
-                    payrollModal.style.display = 'none';
-                }
-            };
-
-            // Close modal function
-            window.closePayrollModal = function() {
-                payrollModal.style.display = 'none';
-            };
-
-            // Handle form submission
-            payrollForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                console.log('Form submitted');
-                
-                const formData = {
-                    name: document.getElementById('employeeName').value,
-                    employeeNumber: document.getElementById('employeeNumber').value,
-                    nrcNumber: document.getElementById('nrcNumber').value,
-                    department: document.getElementById('department').value,
-                    position: document.getElementById('position').value,
-                    basicSalary: parseFloat(document.getElementById('basicSalary').value) || 0,
-                    housingAllowance: parseFloat(document.getElementById('housingAllowance').value) || 0,
-                    transportAllowance: parseFloat(document.getElementById('transportAllowance').value) || 0,
-                    overtimeHours: parseFloat(document.getElementById('overtimeHours').value) || 0,
-                    overtimeRate: parseFloat(document.getElementById('overtimeRate').value) || 0
-                };
-
-                generatePayslip(formData);
-                closePayrollModal();
-            });
-        });
-        </script>
-
-        <script>
-        // Add this function to generate and display the payslip
-        function generatePayslip(data) {
-            // Calculate totals
-            const grossEarnings = data.basicSalary + data.housingAllowance + data.transportAllowance + (data.overtimeHours * data.overtimeRate);
-            const napsaDeduction = Math.min(data.basicSalary * 0.05, 1073.20);
-            const netPay = grossEarnings - napsaDeduction;
-
-            // Create print window
-            const printWindow = window.open('', '_blank');
-            
-            // Create the HTML content without template literals
-            const printContent = [
-                '<!DOCTYPE html>',
-                '<html>',
-                '<head>',
-                '<title>Payslip - ' + data.name + '</title>',
-                '<style>',
-                'body { font-family: Arial, sans-serif; }',
-                '.payslip-container { max-width: 800px; margin: 20px auto; padding: 20px; }',
-                '.logo-container { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }',
-                '.logo { width: 100px; height: auto; }',
-                '.school-info { text-align: center; }',
-                '.employee-details { margin: 20px 0; }',
-                '.salary-details { display: flex; justify-content: space-between; margin: 20px 0; }',
-                '.earnings, .deductions { flex: 1; padding: 10px; }',
-                '.net-pay { background: #1a5f7a; color: white; padding: 10px; text-align: center; margin: 20px 0; }',
-                '.footer { text-align: center; margin-top: 30px; font-size: 12px; }',
-                '@media print { @page { margin: 0.5cm; } body { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }',
-                '</style>',
-                '</head>',
-                '<body>',
-                '<div class="payslip-container">',
-                '<div class="logo-container">',
-                '<img src="zra.png" alt="ZRA Logo" class="logo">',
-                '<div class="school-info">',
-                '<h2>RIVERDALE ACADEMY AND DAY CARE</h2>',
-                '<h3>PAYSLIP</h3>',
-                '<p>21 PAIKANI PHIRI STREET RIVERSIDE, CHINGOLA</p>',
-                '<p>📞 0967182428 | ☎️ 0212 - 271983</p>',
-                '</div>',
-                '<img src="eastlogo.jpg" alt="School Logo" class="logo">',
-                '</div>',
-                '<div class="employee-details">',
-                '<p><strong>Name:</strong> ' + data.name + '</p>',
-                '<p><strong>Employee Number:</strong> ' + data.employeeNumber + '</p>',
-                '<p><strong>NRC Number:</strong> ' + data.nrcNumber + '</p>',
-                '<p><strong>Department:</strong> ' + data.department + '</p>',
-                '<p><strong>Position:</strong> ' + data.position + '</p>',
-                '</div>',
-                '<div class="salary-details">',
-                '<div class="earnings">',
-                '<h4>Earnings</h4>',
-                '<p>Basic Salary: K' + data.basicSalary.toFixed(2) + '</p>',
-                '<p>Housing Allowance: K' + data.housingAllowance.toFixed(2) + '</p>',
-                '<p>Transport Allowance: K' + data.transportAllowance.toFixed(2) + '</p>',
-                '<p>Overtime (' + data.overtimeHours + 'hrs @ K' + data.overtimeRate + '/hr): K' + (data.overtimeHours * data.overtimeRate).toFixed(2) + '</p>',
-                '<p><strong>Gross Earnings: K' + grossEarnings.toFixed(2) + '</strong></p>',
-                '</div>',
-                '<div class="deductions">',
-                '<h4>Deductions</h4>',
-                '<p>NAPSA (5%): K' + napsaDeduction.toFixed(2) + '</p>',
-                '<p><strong>Total Deductions: K' + napsaDeduction.toFixed(2) + '</strong></p>',
-                '</div>',
-                '</div>',
-                '<div class="net-pay">',
-                '<h3>Net Pay: K' + netPay.toFixed(2) + '</h3>',
-                '</div>',
-                '<div class="footer">',
-                '<p>This is a computer generated payslip and does not require signature.</p>',
-                '<p>System Developed By Chinyama Richard</p>',
-                '<p>Contact: 0962299100, 0765099249</p>',
-                '</div>',
-                '</div>',
-                '<script>',
-                'window.onload = function() { window.print(); setTimeout(function() { window.close(); }, 1000); };',
-                '<\/script>',
-                '</body>',
-                '</html>'
-            ].join('\n');
-
-            printWindow.document.write(printContent);
-            printWindow.document.close();
-        }
-        </script>
+        <script type="module" src="work-new.js"></script>
     </div>
-   <script src= "work.js"></script>
-   <script>
-    // Check if browser supports required features
-    if ('serviceWorker' in navigator && 'localStorage' in window && 'indexedDB' in window) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js', { scope: '/' })
-                .then(registration => {
-                    console.log('ServiceWorker registered for offline use');
-                    
-                    // Check for updates
-                    registration.addEventListener('updatefound', () => {
-                        const newWorker = registration.installing;
-                        newWorker.addEventListener('statechange', () => {
-                            if (newWorker.state === 'installed') {
-                                if (navigator.serviceWorker.controller) {
-                                    console.log('New content available, please refresh.');
+    <script>
+        // Check if browser supports required features
+        if ('serviceWorker' in navigator && 'localStorage' in window && 'indexedDB' in window) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                    .then(registration => {
+                        console.log('ServiceWorker registered for offline use');
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed') {
+                                    if (navigator.serviceWorker.controller) {
+                                        console.log('New content available, please refresh.');
+                                    }
                                 }
-                            }
+                            });
                         });
+                    })
+                    .catch(error => {
+                        console.error('ServiceWorker registration failed:', error);
                     });
-                })
-                .catch(error => {
-                    console.error('ServiceWorker registration failed:', error);
+
+                // Handle offline/online events
+                window.addEventListener('offline', () => {
+                    console.log('App is offline, using cached data');
+                    document.body.classList.add('offline-mode');
                 });
 
-            // Handle offline/online events
-            window.addEventListener('offline', () => {
-                console.log('App is offline, using cached data');
-                document.body.classList.add('offline-mode');
-            });
-
-            window.addEventListener('online', () => {
-                console.log('App is back online');
-                document.body.classList.remove('offline-mode');
-                // Trigger sync when back online
-                navigator.serviceWorker.ready.then(registration => {
-                    registration.sync.register('sync-students');
+                window.addEventListener('online', () => {
+                    console.log('App is back online');
+                    document.body.classList.remove('offline-mode');
+                    // Trigger sync when back online
+                    navigator.serviceWorker.ready.then(registration => {
+                        registration.sync.register('sync-students');
+                    });
                 });
             });
-        });
-    } else {
-        console.log('Service Worker is not supported');
-    }
+        } else {
+            console.log('Service Worker is not supported');
+        }
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
