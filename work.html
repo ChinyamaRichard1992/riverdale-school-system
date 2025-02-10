@@ -1102,145 +1102,18 @@
         <script type="module" src="work-new.js"></script>
     </div>
     <script>
-        // Check if browser supports required features
-        if ('serviceWorker' in navigator && 'localStorage' in window && 'indexedDB' in window) {
+        // Service Worker registration
+        if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js', { scope: '/' })
                     .then(registration => {
                         console.log('ServiceWorker registered for offline use');
-                        
-                        // Check for updates
-                        registration.addEventListener('updatefound', () => {
-                            const newWorker = registration.installing;
-                            newWorker.addEventListener('statechange', () => {
-                                if (newWorker.state === 'installed') {
-                                    if (navigator.serviceWorker.controller) {
-                                        console.log('New content available, please refresh.');
-                                    }
-                                }
-                            });
-                        });
                     })
                     .catch(error => {
                         console.error('ServiceWorker registration failed:', error);
                     });
-
-                // Handle offline/online events
-                window.addEventListener('offline', () => {
-                    console.log('App is offline, using cached data');
-                    document.body.classList.add('offline-mode');
-                });
-
-                window.addEventListener('online', () => {
-                    console.log('App is back online');
-                    document.body.classList.remove('offline-mode');
-                    // Trigger sync when back online
-                    navigator.serviceWorker.ready.then(registration => {
-                        registration.sync.register('sync-students');
-                    });
-                });
             });
-        } else {
-            console.log('Service Worker is not supported');
         }
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize charts after DOM is loaded and data is ready
-            setTimeout(() => {
-                if (typeof Chart !== 'undefined' && students.length > 0) {
-                    // Calculate data for charts
-                    const genderData = {
-                        male: students.filter(s => s.gender === 'Male').length,
-                        female: students.filter(s => s.gender === 'Female').length
-                    };
-
-                    const gradeData = Array(9).fill(0);
-                    students.forEach(s => {
-                        if (s.grade >= 1 && s.grade <= 9) {
-                            gradeData[s.grade - 1]++;
-                        }
-                    });
-
-                    const termData = {
-                        1: students.filter(s => s.term === '1').length,
-                        2: students.filter(s => s.term === '2').length,
-                        3: students.filter(s => s.term === '3').length
-                    };
-
-                    // Create Gender Chart
-                    new Chart(document.getElementById('genderChart').getContext('2d'), {
-                        type: 'pie',
-                        data: {
-                            labels: ['Male', 'Female'],
-                            datasets: [{
-                                data: [genderData.male, genderData.female],
-                                backgroundColor: ['#36A2EB', '#FF6384']
-                            }]
-                        }
-                    });
-
-                    // Create Grade Chart
-                    new Chart(document.getElementById('gradeChart').getContext('2d'), {
-                        type: 'bar',
-                        data: {
-                            labels: ['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7', 'G8', 'G9'],
-                            datasets: [{
-                                label: 'Students per Grade',
-                                data: gradeData,
-                                backgroundColor: '#36A2EB'
-                            }]
-                        },
-                        options: {
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        stepSize: 1
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    // Create Term Chart
-                    new Chart(document.getElementById('termChart').getContext('2d'), {
-                        type: 'bar',
-                        data: {
-                            labels: ['Term 1', 'Term 2', 'Term 3'],
-                            datasets: [{
-                                label: 'Students per Term',
-                                data: [termData[1], termData[2], termData[3]],
-                                backgroundColor: '#4CAF50'
-                            }]
-                        },
-                        options: {
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        stepSize: 1
-                                    }
-                                }
-                            }
-                        }
-                    });
-                } else {
-                    console.error('Chart.js not loaded or no student data available');
-                }
-            }, 1000); // Wait for data to be loaded
-        });
-    </script>
-    <script>
-        window.addEventListener('load', function() {
-            const img = document.querySelector('.school-logo');
-            console.log('Image path:', img.src);
-            console.log('Image complete:', img.complete);
-            console.log('Image natural size:', img.naturalWidth, 'x', img.naturalHeight);
-            if (!img.complete || img.naturalWidth === 0) {
-                console.error('Image failed to load');
-            }
-        });
     </script>
 </body>
 </html>
