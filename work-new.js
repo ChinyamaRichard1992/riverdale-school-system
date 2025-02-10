@@ -17,9 +17,14 @@ let currentYear = '';
 // Initialize data and subscriptions
 async function initializeApp() {
     try {
+        console.log('Starting to load data from Supabase...');
+        
         // Load initial data from Supabase
         students = await loadStudentsFromSupabase();
+        console.log('Loaded students:', students);
+        
         schoolFees = await loadSchoolFeesFromSupabase();
+        console.log('Loaded school fees:', schoolFees);
         
         // Update UI with loaded data
         updateStudentTable();
@@ -30,6 +35,7 @@ async function initializeApp() {
         subscribeToChanges(
             // Callback for student changes
             async () => {
+                console.log('Received student update');
                 students = await loadStudentsFromSupabase();
                 updateStudentTable();
                 updateDashboard();
@@ -37,6 +43,7 @@ async function initializeApp() {
             },
             // Callback for fees changes
             async () => {
+                console.log('Received fees update');
                 schoolFees = await loadSchoolFeesFromSupabase();
                 updateDashboard();
                 updateGradeSummary();
@@ -109,12 +116,61 @@ document.getElementById('studentForm').addEventListener('submit', async function
 
 // Initialize the application when the page loads
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing app...');
     initializeApp();
     
-    // Add other event listeners and initialization code here
+    // Add other event listeners
     document.getElementById('searchInput').addEventListener('input', searchStudents);
-    // ... (keep other existing event listeners)
+    
+    // Set current term and year
+    const currentDate = new Date();
+    currentYear = currentDate.getFullYear().toString();
+    const month = currentDate.getMonth() + 1;
+    currentTerm = month <= 4 ? '1' : month <= 8 ? '2' : '3';
+    
+    console.log('Current term:', currentTerm, 'Current year:', currentYear);
 });
 
-// Keep all your existing UI-related functions (updateStudentTable, showInvoice, etc.)
+// Helper function to show notifications
+function showNotification(message, color = '#4CAF50') {
+    const notification = document.createElement('div');
+    notification.textContent = message;
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.right = '20px';
+    notification.style.backgroundColor = color;
+    notification.style.color = 'white';
+    notification.style.padding = '15px';
+    notification.style.borderRadius = '5px';
+    notification.style.zIndex = '1000';
+    
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 3000);
+}
+
+// Update the student table display
+function updateStudentTable() {
+    const tableBody = document.querySelector('#studentTable tbody');
+    if (!tableBody) {
+        console.error('Student table body not found');
+        return;
+    }
+    
+    tableBody.innerHTML = '';
+    students.forEach(student => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${student.studentNumber}</td>
+            <td>${student.name}</td>
+            <td>${student.grade}</td>
+            <td>
+                <button onclick="editStudent('${student.studentNumber}')" class="edit-btn">Edit</button>
+                <button onclick="deleteStudent('${student.studentNumber}')" class="delete-btn">Delete</button>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+// Keep all your existing UI-related functions (updateDashboard, updateGradeSummary, etc.)
 // but remove their data persistence logic since that's now handled by Supabase
